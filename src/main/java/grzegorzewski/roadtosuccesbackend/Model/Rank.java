@@ -16,7 +16,7 @@ import java.util.List;
 public class Rank {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private String fullName;
     private String shortName;
     private String idea;

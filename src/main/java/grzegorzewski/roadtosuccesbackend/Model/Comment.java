@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private LocalDate date;
     @ManyToOne
     private User user;

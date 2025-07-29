@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -14,12 +16,12 @@ import lombok.NoArgsConstructor;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @ManyToOne
     private RankInProgress rankInProgress;
     private String content;
     private Status status;
     private String partIdea;
-    @OneToOne(cascade = CascadeType.ALL)
-    private Comment comment;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Comment> comments;
 }
