@@ -19,7 +19,7 @@ public class RankInProgress {
     @ManyToOne
     private Rank rank;
     @ManyToOne
-    private User user;
+    private AppUser user;
     @Enumerated(EnumType.STRING)
     private Status status;
     @ManyToMany(fetch = FetchType.EAGER)
