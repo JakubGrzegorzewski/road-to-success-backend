@@ -18,6 +18,6 @@ public class Comment {
     private long id;
     private LocalDate date;
     @ManyToOne
-    private User user;
+    private AppUser user;
     private String content;
 }
