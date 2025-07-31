@@ -24,8 +24,14 @@ public class RankController {
         return ResponseEntity.ok(rankService.getById(id));
     }
 
+    @GetMapping("/rankInProgress/{rankInProgressId}")
+    public ResponseEntity<Rank> findRankForRankInProgress(@PathVariable long rankInProgressId) {
+        return ResponseEntity.ok(rankService.findRankForRankInProgress(rankInProgressId));
+    }
+
     @PostMapping
     public ResponseEntity<Rank> save(@RequestBody Rank rank) {
+        System.out.println(rank);
         return ResponseEntity.ok(rankService.save(rank));
     }
 

@@ -1,5 +1,6 @@
 package grzegorzewski.roadtosuccesbackend.Controller;
 
+import grzegorzewski.roadtosuccesbackend.Model.Rank;
 import grzegorzewski.roadtosuccesbackend.Model.RankInProgress;
 import grzegorzewski.roadtosuccesbackend.Service.RankInProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ class RankInProgressController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<RankInProgress>> findAllRanksInProgressForUser(@PathVariable long user){
-        return ResponseEntity.ok(rankInProgressService.findAllRanksInProgressForUser(user));
+    public ResponseEntity<List<RankInProgress>> findAllRanksInProgressForUser(@PathVariable long userId){
+        return ResponseEntity.ok(rankInProgressService.findAllRanksInProgressForUser(userId));
     }
 
     @PostMapping

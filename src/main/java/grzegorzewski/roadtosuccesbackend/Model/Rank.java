@@ -15,10 +15,11 @@ import java.util.List;
 @Builder
 public class Rank {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    private Long id;
     private String fullName;
     private String shortName;
+    @Column(length = 1000)
     private String idea;
     private List<String> startRequirements;
     private List<String> endRequirements;

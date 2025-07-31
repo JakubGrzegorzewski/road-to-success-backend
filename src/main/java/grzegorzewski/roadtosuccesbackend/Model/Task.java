@@ -15,8 +15,8 @@ import java.util.List;
 @Builder
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    private Long id;
     @ManyToOne
     private RankInProgress rankInProgress;
     private String content;

@@ -14,8 +14,8 @@ import java.util.List;
 @Builder
 public class RankInProgress {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    private Long id;
     @ManyToOne
     private Rank rank;
     @ManyToOne

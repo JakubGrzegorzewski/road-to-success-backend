@@ -1,6 +1,8 @@
 package grzegorzewski.roadtosuccesbackend.Service;
 
 import grzegorzewski.roadtosuccesbackend.Model.Rank;
+import grzegorzewski.roadtosuccesbackend.Model.RankInProgress;
+import grzegorzewski.roadtosuccesbackend.Repository.RankInProgressRepository;
 import grzegorzewski.roadtosuccesbackend.Repository.RankRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ public class RankService {
     @Autowired
     private RankRepository rankRepository;
 
+    @Autowired
+    private RankInProgressRepository rankInProgressRepository;
+
     public List<Rank> getRanks() {
         return (List<Rank>) rankRepository.findAll();
     }
@@ -20,6 +25,12 @@ public class RankService {
     public Rank getById(long id) {
         return rankRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rank not found with id " + id));
+    }
+
+    public Rank findRankForRankInProgress(long rankInProgressId) {
+        return rankInProgressRepository.findById(rankInProgressId).orElseThrow(
+                () -> new EntityNotFoundException("RankInProgress not found with id " + rankInProgressId))
+                .getRank();
     }
 
     public Rank save(Rank rank) {

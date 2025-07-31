@@ -15,13 +15,13 @@ import java.util.List;
 @Builder
 public class AppUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    private Long id;
     private String fullName;
     private String email;
     private String password;
     private String role;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RankInProgress> ranksInProgress;
 }

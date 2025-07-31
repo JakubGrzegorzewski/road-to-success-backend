@@ -5,6 +5,7 @@ import grzegorzewski.roadtosuccesbackend.Model.AppUser;
 import grzegorzewski.roadtosuccesbackend.Repository.RankInProgressRepository;
 import grzegorzewski.roadtosuccesbackend.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.h2.engine.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +26,19 @@ public class RankInProgressService {
     }
 
     public List<RankInProgress> findAllRanksInProgressForUser(long userId) {
-        return userRepository.findById(userId)
-                .map(AppUser::getRanksInProgress)
+         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
+
+        return user.getRanksInProgress();
     }
 
     public RankInProgress save(RankInProgress rankInProgress) {
-        if (!rankInProgressRepository.existsById(rankInProgress.getId())) {
+        if (rankInProgress.getId() == null) {
+            return rankInProgressRepository.save(rankInProgress);
+        } else if (!rankInProgressRepository.existsById(rankInProgress.getId())) {
             return rankInProgressRepository.save(rankInProgress);
         } else {
-            throw new EntityNotFoundException("RankInProgress already exists with id " + rankInProgress.getId());
+            throw new IllegalArgumentException("RankInProgress already exists with id " + rankInProgress.getId());
         }
     }
 

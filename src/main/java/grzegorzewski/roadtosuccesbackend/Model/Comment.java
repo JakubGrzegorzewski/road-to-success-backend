@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    private Long id;
     private LocalDate date;
     @ManyToOne
     private AppUser user;
