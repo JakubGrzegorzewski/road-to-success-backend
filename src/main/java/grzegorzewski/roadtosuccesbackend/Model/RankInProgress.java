@@ -1,5 +1,6 @@
 package grzegorzewski.roadtosuccesbackend.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class RankInProgress {
     @ManyToOne
     private Rank rank;
     @ManyToOne
+    @JsonBackReference
     private AppUser user;
     @Enumerated(EnumType.STRING)
     private Status status;

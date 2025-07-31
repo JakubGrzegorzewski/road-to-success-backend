@@ -1,5 +1,6 @@
 package grzegorzewski.roadtosuccesbackend.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +24,6 @@ public class AppUser {
     private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<RankInProgress> ranksInProgress;
 }
