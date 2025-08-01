@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Requirements {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private float number;
     private String content;

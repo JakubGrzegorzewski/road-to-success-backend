@@ -1,6 +1,5 @@
 package grzegorzewski.roadtosuccesbackend.Controller;
 
-import grzegorzewski.roadtosuccesbackend.Model.Rank;
 import grzegorzewski.roadtosuccesbackend.Model.RankInProgress;
 import grzegorzewski.roadtosuccesbackend.Service.RankInProgressService;
 import org.springframework.beans.factory.annotation.Autowired;

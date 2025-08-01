@@ -17,14 +17,24 @@ public class AppUserService {
     }
 
     public AppUser save(AppUser user) {
-        if (!userRepository.existsById(user.getId())) {
+        if (user.getId() == null) {
             return userRepository.save(user);
         } else {
-            throw new EntityNotFoundException("User already exists with id " + user.getId());
+            if (userRepository.existsById(user.getId())) {
+                throw new IllegalArgumentException("User already exists with id " + user.getId());
+            } else {
+                return userRepository.save(user);
+            }
         }
     }
 
     public AppUser update(AppUser user) {
+        if (user.getId() == null) {
+            throw new IllegalArgumentException("User ID cannot be null for update operation");
+        }
+        if (!userRepository.existsById(user.getId())) {
+            throw new EntityNotFoundException("User not found with id " + user.getId());
+        }
         return userRepository.save(user);
     }
 

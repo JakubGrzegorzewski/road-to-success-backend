@@ -36,18 +36,26 @@ public class CommentService {
     }
 
     public Comment save(Comment comment) {
-        if (!commentRepository.existsById(comment.getId()))
+        if (comment.getId() == null) {
             return commentRepository.save(comment);
-        else
-            throw new EntityNotFoundException("Comment already exists " + comment.getId());
+        } else {
+            if (commentRepository.existsById(comment.getId())) {
+                throw new IllegalArgumentException("Comment already exists with id " + comment.getId());
+            } else {
+                return commentRepository.save(comment);
+            }
+        }
     }
 
     public Comment update(Comment comment) {
+        if (comment.getId() == null) {
+            throw new IllegalArgumentException("Comment ID cannot be null for update operation");
+        }
+
         Comment commentToUpdate = commentRepository.findById(comment.getId())
-            .orElseThrow(
-                () -> new EntityNotFoundException("Comment not found with id " + comment.getId()
-            )
-        );
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Comment not found with id " + comment.getId())
+                );
         commentToUpdate.setContent(comment.getContent());
         commentToUpdate.setDate(LocalDate.now());
         return commentRepository.save(commentToUpdate);
@@ -58,6 +66,5 @@ public class CommentService {
             commentRepository.deleteById(id);
         else
             throw new EntityNotFoundException("Comment not found with id " + id);
-
     }
 }

@@ -1,6 +1,8 @@
 package grzegorzewski.roadtosuccesbackend.Model;
 
 import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,10 +16,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Comment {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
     @ManyToOne
     private AppUser user;
     private String content;
+    @ManyToOne
+    @JsonBackReference
+    private Task task;
 }

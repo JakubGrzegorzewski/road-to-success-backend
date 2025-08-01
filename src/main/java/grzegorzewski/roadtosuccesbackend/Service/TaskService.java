@@ -30,19 +30,25 @@ public class TaskService {
     }
 
     public Task save(Task task) {
-        if (!taskRepository.existsById(task.getId())) {
+        if (task.getId() == null) {
             return taskRepository.save(task);
         } else {
-            throw new EntityNotFoundException("Task already exists with id " + task.getId());
+            if (taskRepository.existsById(task.getId())) {
+                throw new IllegalArgumentException("Task already exists with id " + task.getId());
+            } else {
+                return taskRepository.save(task);
+            }
         }
     }
 
     public Task update(Task task) {
-        if (taskRepository.existsById(task.getId())) {
-            return taskRepository.save(task);
-        } else {
+        if (task.getId() == null) {
+            throw new IllegalArgumentException("Task ID cannot be null for update operation");
+        }
+        if (!taskRepository.existsById(task.getId())) {
             throw new EntityNotFoundException("Task not found with id " + task.getId());
         }
+        return taskRepository.save(task);
     }
 
     public void delete(long id) {

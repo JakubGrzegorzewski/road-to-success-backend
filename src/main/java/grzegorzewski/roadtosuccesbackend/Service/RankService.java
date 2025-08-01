@@ -29,19 +29,29 @@ public class RankService {
 
     public Rank findRankForRankInProgress(long rankInProgressId) {
         return rankInProgressRepository.findById(rankInProgressId).orElseThrow(
-                () -> new EntityNotFoundException("RankInProgress not found with id " + rankInProgressId))
+                        () -> new EntityNotFoundException("RankInProgress not found with id " + rankInProgressId))
                 .getRank();
     }
 
     public Rank save(Rank rank) {
-        if (!rankRepository.existsById(rank.getId())) {
+        if (rank.getId() == null) {
             return rankRepository.save(rank);
         } else {
-            throw new EntityNotFoundException("Rank already exists with id " + rank.getId());
+            if (rankRepository.existsById(rank.getId())) {
+                throw new IllegalArgumentException("Rank already exists with id " + rank.getId());
+            } else {
+                return rankRepository.save(rank);
+            }
         }
     }
 
     public Rank update(Rank rank) {
+        if (rank.getId() == null) {
+            throw new IllegalArgumentException("Rank ID cannot be null for update operation");
+        }
+        if (!rankRepository.existsById(rank.getId())) {
+            throw new EntityNotFoundException("Rank not found with id " + rank.getId());
+        }
         return rankRepository.save(rank);
     }
 
@@ -52,7 +62,4 @@ public class RankService {
             throw new EntityNotFoundException("Rank not found with id " + id);
         }
     }
-
-
-
 }
