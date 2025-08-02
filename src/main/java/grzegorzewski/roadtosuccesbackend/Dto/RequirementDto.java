@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class RequirementDto {
     private Long id;
-    private float number;
+    private String number;
     private String content;
     private Long rankId;
     private List<Long> taskIds;
