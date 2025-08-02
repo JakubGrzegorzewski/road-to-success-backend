@@ -19,7 +19,7 @@ public class Requirement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private float number;
+    private String number;
     private String content;
 
     @ManyToOne
