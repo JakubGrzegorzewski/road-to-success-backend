@@ -1,5 +1,7 @@
 package grzegorzewski.roadtosuccesbackend.Service;
 
+import grzegorzewski.roadtosuccesbackend.Dto.AppUserDto;
+import grzegorzewski.roadtosuccesbackend.Mapper.AppUserMapper;
 import grzegorzewski.roadtosuccesbackend.Model.AppUser;
 import grzegorzewski.roadtosuccesbackend.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -9,33 +11,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppUserService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    public AppUser getById(long id) {
-        return userRepository.findById(id)
+    @Autowired
+    private AppUserMapper userMapper;
+
+    public AppUserDto getById(long id) {
+        AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+        return userMapper.toDto(user);
     }
 
-    public AppUser save(AppUser user) {
-        if (user.getId() == null) {
-            return userRepository.save(user);
-        } else {
-            if (userRepository.existsById(user.getId())) {
-                throw new IllegalArgumentException("User already exists with id " + user.getId());
-            } else {
-                return userRepository.save(user);
-            }
+    public AppUserDto save(AppUserDto userDto) {
+        if (userDto.getId() != null && userRepository.existsById(userDto.getId())) {
+            throw new IllegalArgumentException("User already exists with id " + userDto.getId());
         }
+
+        AppUser user = userMapper.toEntity(userDto);
+        AppUser savedUser = userRepository.save(user);
+        return userMapper.toDto(savedUser);
     }
 
-    public AppUser update(AppUser user) {
-        if (user.getId() == null) {
+    public AppUserDto update(AppUserDto userDto) {
+        if (userDto.getId() == null) {
             throw new IllegalArgumentException("User ID cannot be null for update operation");
         }
-        if (!userRepository.existsById(user.getId())) {
-            throw new EntityNotFoundException("User not found with id " + user.getId());
+        if (!userRepository.existsById(userDto.getId())) {
+            throw new EntityNotFoundException("User not found with id " + userDto.getId());
         }
-        return userRepository.save(user);
+
+        AppUser user = userMapper.toEntity(userDto);
+        AppUser updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
     }
 
     public void delete(long id) {

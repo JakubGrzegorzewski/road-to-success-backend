@@ -1,5 +1,7 @@
 package grzegorzewski.roadtosuccesbackend.Service;
 
+import grzegorzewski.roadtosuccesbackend.Dto.RankDto;
+import grzegorzewski.roadtosuccesbackend.Mapper.RankMapper;
 import grzegorzewski.roadtosuccesbackend.Model.Rank;
 import grzegorzewski.roadtosuccesbackend.Model.RankInProgress;
 import grzegorzewski.roadtosuccesbackend.Repository.RankInProgressRepository;
@@ -18,41 +20,47 @@ public class RankService {
     @Autowired
     private RankInProgressRepository rankInProgressRepository;
 
-    public List<Rank> getRanks() {
-        return (List<Rank>) rankRepository.findAll();
+    @Autowired
+    private RankMapper rankMapper;
+
+    public List<RankDto> getRanks() {
+        List<Rank> ranks = (List<Rank>) rankRepository.findAll();
+        return rankMapper.toDtoList(ranks);
     }
 
-    public Rank getById(long id) {
-        return rankRepository.findById(id)
+    public RankDto getById(long id) {
+        Rank rank = rankRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rank not found with id " + id));
+        return rankMapper.toDto(rank);
     }
 
-    public Rank findRankForRankInProgress(long rankInProgressId) {
-        return rankInProgressRepository.findById(rankInProgressId).orElseThrow(
-                        () -> new EntityNotFoundException("RankInProgress not found with id " + rankInProgressId))
-                .getRank();
+    public RankDto findRankForRankInProgress(long rankInProgressId) {
+        RankInProgress rankInProgress = rankInProgressRepository.findById(rankInProgressId)
+                .orElseThrow(() -> new EntityNotFoundException("RankInProgress not found with id " + rankInProgressId));
+        return rankMapper.toDto(rankInProgress.getRank());
     }
 
-    public Rank save(Rank rank) {
-        if (rank.getId() == null) {
-            return rankRepository.save(rank);
-        } else {
-            if (rankRepository.existsById(rank.getId())) {
-                throw new IllegalArgumentException("Rank already exists with id " + rank.getId());
-            } else {
-                return rankRepository.save(rank);
-            }
+    public RankDto save(RankDto rankDto) {
+        if (rankDto.getId() != null && rankRepository.existsById(rankDto.getId())) {
+            throw new IllegalArgumentException("Rank already exists with id " + rankDto.getId());
         }
+
+        Rank rank = rankMapper.toEntity(rankDto);
+        Rank savedRank = rankRepository.save(rank);
+        return rankMapper.toDto(savedRank);
     }
 
-    public Rank update(Rank rank) {
-        if (rank.getId() == null) {
+    public RankDto update(RankDto rankDto) {
+        if (rankDto.getId() == null) {
             throw new IllegalArgumentException("Rank ID cannot be null for update operation");
         }
-        if (!rankRepository.existsById(rank.getId())) {
-            throw new EntityNotFoundException("Rank not found with id " + rank.getId());
+        if (!rankRepository.existsById(rankDto.getId())) {
+            throw new EntityNotFoundException("Rank not found with id " + rankDto.getId());
         }
-        return rankRepository.save(rank);
+
+        Rank rank = rankMapper.toEntity(rankDto);
+        Rank updatedRank = rankRepository.save(rank);
+        return rankMapper.toDto(updatedRank);
     }
 
     public void delete(long id) {

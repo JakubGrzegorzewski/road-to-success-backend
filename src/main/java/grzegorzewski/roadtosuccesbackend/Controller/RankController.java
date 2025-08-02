@@ -1,6 +1,6 @@
 package grzegorzewski.roadtosuccesbackend.Controller;
 
-import grzegorzewski.roadtosuccesbackend.Model.Rank;
+import grzegorzewski.roadtosuccesbackend.Dto.RankDto;
 import grzegorzewski.roadtosuccesbackend.Service.RankService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,28 +15,27 @@ public class RankController {
     private RankService rankService;
 
     @GetMapping
-    public ResponseEntity<List<Rank>> getRanks() {
+    public ResponseEntity<List<RankDto>> getRanks() {
         return ResponseEntity.ok(rankService.getRanks());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Rank> getById(@PathVariable long id) {
+    public ResponseEntity<RankDto> getById(@PathVariable long id) {
         return ResponseEntity.ok(rankService.getById(id));
     }
 
     @GetMapping("/rankInProgress/{rankInProgressId}")
-    public ResponseEntity<Rank> findRankForRankInProgress(@PathVariable long rankInProgressId) {
+    public ResponseEntity<RankDto> findRankForRankInProgress(@PathVariable long rankInProgressId) {
         return ResponseEntity.ok(rankService.findRankForRankInProgress(rankInProgressId));
     }
 
     @PostMapping
-    public ResponseEntity<Rank> save(@RequestBody Rank rank) {
-        System.out.println(rank);
+    public ResponseEntity<RankDto> save(@RequestBody RankDto rank) {
         return ResponseEntity.ok(rankService.save(rank));
     }
 
     @PutMapping
-    public ResponseEntity<Rank> update(@RequestBody Rank rank) {
+    public ResponseEntity<RankDto> update(@RequestBody RankDto rank) {
         return ResponseEntity.ok(rankService.update(rank));
     }
 
@@ -45,6 +44,4 @@ public class RankController {
         rankService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

@@ -1,9 +1,8 @@
 package grzegorzewski.roadtosuccesbackend.Controller;
 
-import grzegorzewski.roadtosuccesbackend.Model.Task;
+import grzegorzewski.roadtosuccesbackend.Dto.TaskDto;
 import grzegorzewski.roadtosuccesbackend.Service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,22 +15,22 @@ class TaskController {
     private TaskService taskService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> findById(@PathVariable long id) {
+    public ResponseEntity<TaskDto> findById(@PathVariable long id) {
         return ResponseEntity.ok(taskService.findById(id));
     }
 
     @GetMapping("/rankInProgress/{rankInProgressId}")
-    public ResponseEntity<List<Task>> findAllTasksForRankInProgress(@PathVariable long rankInProgressId) {
+    public ResponseEntity<List<TaskDto>> findAllTasksForRankInProgress(@PathVariable long rankInProgressId) {
         return ResponseEntity.ok(taskService.findAllTasksForRankInProgress(rankInProgressId));
     }
 
     @PostMapping
-    public ResponseEntity<Task> save(@RequestBody Task task) {
+    public ResponseEntity<TaskDto> save(@RequestBody TaskDto task) {
         return ResponseEntity.ok(taskService.save(task));
     }
 
     @PutMapping
-    public ResponseEntity<Task> update(@RequestBody Task task) {
+    public ResponseEntity<TaskDto> update(@RequestBody TaskDto task) {
         return ResponseEntity.ok(taskService.update(task));
     }
 
@@ -40,5 +39,4 @@ class TaskController {
         taskService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

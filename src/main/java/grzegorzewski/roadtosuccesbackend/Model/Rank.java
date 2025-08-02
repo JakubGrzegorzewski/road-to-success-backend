@@ -1,5 +1,6 @@
 package grzegorzewski.roadtosuccesbackend.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,12 @@ public class Rank {
     private String idea;
     private List<String> startRequirements;
     private List<String> endRequirements;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Requirements> requirements;
+
+    @OneToMany(mappedBy = "rank", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("rank-requirements")
+    private List<Requirement> requirements;
+
+    @OneToMany(mappedBy = "rank", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("rankInProgress-rank")
+    private List<RankInProgress> ranksInProgress;
 }
