@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>grzegorzewski</groupId>
-    <artifactId>road-to-succes-backend</artifactId>
+    <artifactId>road-to-success-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>road-to-succes-backend</name>
     <description>road-to-succes-backend</description>
