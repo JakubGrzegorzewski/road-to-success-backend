@@ -12,7 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -50,6 +50,8 @@ public class CommentService {
 
         Comment comment = commentMapper.toEntity(commentDto);
 
+        comment.setDate(LocalDateTime.now());
+
         // Set relationships
         if (commentDto.getUserId() != null) {
             AppUser user = userRepository.findById(commentDto.getUserId())
@@ -76,7 +78,7 @@ public class CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("Comment not found with id " + commentDto.getId()));
 
         existingComment.setContent(commentDto.getContent());
-        existingComment.setDate(LocalDate.now());
+        existingComment.setDate(LocalDateTime.now());
 
         Comment updatedComment = commentRepository.save(existingComment);
         return commentMapper.toDto(updatedComment);

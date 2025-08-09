@@ -1,11 +1,12 @@
 package grzegorzewski.roadtosuccesbackend.Dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +14,8 @@ import java.time.LocalDate;
 @Builder
 public class CommentDto {
     private Long id;
-    private LocalDate date;
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime date;
     private Long userId;
     private String content;
     private Long taskId;

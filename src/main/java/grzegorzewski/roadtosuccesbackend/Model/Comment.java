@@ -1,8 +1,9 @@
 package grzegorzewski.roadtosuccesbackend.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,8 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate date;
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime date;
 
     @ManyToOne
     @JsonBackReference("user-comments")
