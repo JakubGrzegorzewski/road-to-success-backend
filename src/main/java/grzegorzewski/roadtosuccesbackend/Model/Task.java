@@ -26,7 +26,9 @@ public class Task {
     private Requirement requirement;
 
     private String content;
+    @Enumerated(EnumType.STRING)
     private Status status;
+    @Lob
     private String partIdea;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
