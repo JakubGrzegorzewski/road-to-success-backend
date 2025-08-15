@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class AdvancementDocument {
-    private UserData userData;
+    private AdvDocData userData;
     private final float IDEA_TEXT_WIDTH = 450f;
     private int PAGE_NUMBER = 1;
 
@@ -23,7 +23,7 @@ public class AdvancementDocument {
     private final PDFont mediumFont;
     private final PDFont lightFont;
 
-    public AdvancementDocument(UserData userData) throws IOException {
+    public AdvancementDocument(AdvDocData userData) throws IOException {
         document = new PDDocument();
         boldFont = PDType0Font.load(document, new java.io.File("src/main/resources/fonts/Museo-700.ttf"));
         mediumFont = PDType0Font.load(document, new java.io.File("src/main/resources/fonts/Museo-500.ttf"));
@@ -40,7 +40,7 @@ public class AdvancementDocument {
             document.addPage(createSecondPage());
         }
 
-        for (TaskData task : userData.getTasks()) {
+        for (AdvDocTask task : userData.getTasks()) {
             document.addPage(createTaskPages(task));
         }
 
@@ -54,15 +54,29 @@ public class AdvancementDocument {
             addBackground(content, page);
 
             content.beginText();
+
+            float previousX = 20;
+
+            // Idea section title
+            String ideaTitle = "Idea stopnia";
+            content.setFont(boldFont, 24);
+            content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
+            float ideaTitleX = CustomPDFMethods.getNextLineCenterOffset(ideaTitle, boldFont, 24, page);
+            content.newLineAtOffset(ideaTitleX - previousX, page.getArtBox().getHeight() - 200);
+            content.showText(ideaTitle);
+            previousX = ideaTitleX;
+
+            // Idea text
             content.setFont(lightFont, 14);
             content.setNonStrokingColor(Color.BLACK);
 
             List<String> lines = CustomPDFMethods.splitTextIntoLines(userData.getIdea(), lightFont, 14, IDEA_TEXT_WIDTH);
             String longestLine = findLongestLine(lines);
             float ideaTextX = CustomPDFMethods.getNextLineCenterOffset(longestLine, lightFont, 14, page);
-            content.newLineAtOffset(ideaTextX-20, page.getArtBox().getHeight() - 100);
 
+            content.newLineAtOffset(ideaTextX - previousX, -30);
             drawJustifiedText(content, lines, lightFont, 14, IDEA_TEXT_WIDTH);
+
             content.endText();
 
             addFooter(content, page, PAGE_NUMBER++);
@@ -72,12 +86,12 @@ public class AdvancementDocument {
         return page;
     }
 
-    private PDPage createFirstPage(UserData data) throws IOException {
+    private PDPage createFirstPage(AdvDocData data) throws IOException {
         PDPage page = new PDPage(PDRectangle.A4);
 
         try (PDPageContentStream content = new PDPageContentStream(document, page)) {
             addBackground(content, page);
-            drawCenteredImage(content, page, data.getImagePath(), 120, new Vector2D(-20,270));
+            drawCenteredImage(content, page, data.getImagePath(), 120, new Vector2D(-20,170));
             drawContent(content, page, data, new Vector2D(20,0));
             addFooter(content, page, PAGE_NUMBER++);
         } catch (Exception e) {
@@ -87,7 +101,7 @@ public class AdvancementDocument {
         return page;
     }
 
-    private PDPage createTaskPages(TaskData taskData) throws IOException {
+    private PDPage createTaskPages(AdvDocTask taskData) throws IOException {
         PDPage page = new PDPage(PDRectangle.A4);
         try (PDPageContentStream content = new PDPageContentStream(document, page)) {
             addBackground(content, page);
@@ -175,7 +189,7 @@ public class AdvancementDocument {
         content.drawImage(image, imagePos.getX() + offset.getX(), imagePos.getY() + offset.getY(), imageSize.getX(), imageSize.getY());
     }
 
-    private void drawContent(PDPageContentStream content, PDPage page, UserData data, Vector2D offset) throws IOException {
+    private void drawContent(PDPageContentStream content, PDPage page, AdvDocData data, Vector2D offset) throws IOException {
         content.beginText();
 
         float currentY = 550;
@@ -186,7 +200,7 @@ public class AdvancementDocument {
         content.setFont(boldFont, 24);
         content.setNonStrokingColor(Color.BLACK);
         float titleX = CustomPDFMethods.getNextLineCenterOffset(title, boldFont, 24, page);
-        content.newLineAtOffset(titleX - previousX, currentY);
+        content.newLineAtOffset(titleX - previousX, currentY-100);
         content.showText(title);
         previousX = titleX;
         currentY -= 25;
@@ -235,28 +249,6 @@ public class AdvancementDocument {
         float mentorNameX = CustomPDFMethods.getNextLineCenterOffset(data.getMentorName(), lightFont, 18, page);
         content.newLineAtOffset(mentorNameX - previousX, -25);
         content.showText(data.getMentorName());
-        previousX = mentorNameX;
-        currentY -= 70;
-
-        // Idea section title
-        String ideaTitle = "Idea stopnia";
-        content.setFont(boldFont, 24);
-        content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
-        float ideaTitleX = CustomPDFMethods.getNextLineCenterOffset(ideaTitle, boldFont, 24, page);
-        content.newLineAtOffset(ideaTitleX - previousX, -45);
-        content.showText(ideaTitle);
-        previousX = ideaTitleX;
-
-        // Idea text
-        content.setFont(lightFont, 14);
-        content.setNonStrokingColor(Color.BLACK);
-
-        List<String> lines = CustomPDFMethods.splitTextIntoLines(data.getIdea(), lightFont, 14, IDEA_TEXT_WIDTH);
-        String longestLine = findLongestLine(lines);
-        float ideaTextX = CustomPDFMethods.getNextLineCenterOffset(longestLine, lightFont, 14, page);
-
-        content.newLineAtOffset(ideaTextX - previousX, -30);
-        drawJustifiedText(content, lines, lightFont, 14, IDEA_TEXT_WIDTH);
 
         content.endText();
     }
