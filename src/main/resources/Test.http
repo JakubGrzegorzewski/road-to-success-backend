@@ -403,5 +403,10 @@ Content-Type: application/json
 {
   "rankId": 1,
   "userId": 1,
+  "mentorId": 1,
   "status": "CREATED"
 }
+
+
+### Generate RankInProgress for User ID 1 and Rank ID 1
+GET http://localhost:8081/api/rankInProgress/generate/1

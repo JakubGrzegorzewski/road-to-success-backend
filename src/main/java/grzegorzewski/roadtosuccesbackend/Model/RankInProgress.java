@@ -25,6 +25,10 @@ public class RankInProgress {
     @JsonBackReference("user-rankInProgress")
     private AppUser user;
 
+    @ManyToOne
+    @JsonBackReference("mentor-rankInProgress")
+    private AppUser mentor;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 

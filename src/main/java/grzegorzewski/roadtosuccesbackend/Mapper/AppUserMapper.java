@@ -25,6 +25,10 @@ public class AppUserMapper {
                         user.getRanksInProgress().stream()
                                 .map(RankInProgress::getId)
                                 .collect(Collectors.toList()) : null)
+                .mentorRanksInProgressIds(user.getMentorRanksInProgress() != null ?
+                        user.getMentorRanksInProgress().stream()
+                                .map(RankInProgress::getId)
+                                .collect(Collectors.toList()) : null)
                 .commentIds(user.getComments() != null ?
                         user.getComments().stream()
                                 .map(Comment::getId)

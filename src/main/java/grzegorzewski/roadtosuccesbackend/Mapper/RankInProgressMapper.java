@@ -18,6 +18,7 @@ public class RankInProgressMapper {
                 .id(rankInProgress.getId())
                 .rankId(rankInProgress.getRank() != null ? rankInProgress.getRank().getId() : null)
                 .userId(rankInProgress.getUser() != null ? rankInProgress.getUser().getId() : null)
+                .mentorId(rankInProgress.getMentor() != null ? rankInProgress.getMentor().getId() : null)
                 .status(rankInProgress.getStatus())
                 .taskIds(rankInProgress.getTasks() != null ?
                         rankInProgress.getTasks().stream()

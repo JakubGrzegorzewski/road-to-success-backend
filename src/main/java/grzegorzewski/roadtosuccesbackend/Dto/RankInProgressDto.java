@@ -16,6 +16,7 @@ public class RankInProgressDto {
     private Long id;
     private Long rankId;
     private Long userId;
+    private Long mentorId;
     private Status status;
     private List<Long> taskIds;
 }

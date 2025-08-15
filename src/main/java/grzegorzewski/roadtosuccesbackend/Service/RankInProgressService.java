@@ -1,5 +1,8 @@
 package grzegorzewski.roadtosuccesbackend.Service;
 
+import grzegorzewski.roadtosuccesbackend.Document.Write.AdvancementDocument;
+import grzegorzewski.roadtosuccesbackend.Document.Write.AdvDocTask;
+import grzegorzewski.roadtosuccesbackend.Document.Write.AdvDocData;
 import grzegorzewski.roadtosuccesbackend.Dto.RankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Mapper.RankInProgressMapper;
 import grzegorzewski.roadtosuccesbackend.Model.AppUser;
@@ -12,6 +15,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +40,40 @@ public class RankInProgressService {
         return rankInProgressMapper.toDto(rankInProgress);
     }
 
+    public byte[] generateFile(long id) {
+        RankInProgress rankInProgress = rankInProgressRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("RankInProgress not found with id " + id));
+
+
+        AdvDocData userData = new AdvDocData();
+
+        userData.setMenteeName(rankInProgress.getUser().getFullName());
+        userData.setMentorName(rankInProgress.getMentor().getFullName());
+        userData.setIdea(rankInProgress.getRank().getIdea());
+
+        List<AdvDocTask> tasks = new ArrayList<>();
+        rankInProgress.getTasks().forEach(task -> {
+            AdvDocTask taskData = new AdvDocTask();
+            taskData.setTitle(task.getRequirement().getNumber() + ". " + task.getRequirement().getContent());
+            taskData.setIdeaPart(task.getPartIdea());
+            taskData.setTask(task.getContent());
+            tasks.add(taskData);
+        });
+        userData.setTasks(tasks);
+        userData.setAdvancement(rankInProgress.getRank().getShortName());
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            AdvancementDocument advancementDocument = new AdvancementDocument(userData);
+            advancementDocument.generateDocument(baos);
+
+        }catch (Exception e) {
+            throw new RuntimeException("Error generating document: " + e.getMessage(), e);
+        }
+        return baos.toByteArray();
+    }
+
     public List<RankInProgressDto> findAllRanksInProgressForUser(long userId) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
@@ -53,6 +92,12 @@ public class RankInProgressService {
             AppUser user = userRepository.findById(rankInProgressDto.getUserId())
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id " + rankInProgressDto.getUserId()));
             rankInProgress.setUser(user);
+        }
+
+        if (rankInProgressDto.getMentorId() != null) {
+            AppUser mentor = userRepository.findById(rankInProgressDto.getMentorId())
+                    .orElseThrow(() -> new EntityNotFoundException("Mentor not found with id " + rankInProgressDto.getMentorId()));
+            rankInProgress.setMentor(mentor);
         }
 
         if (rankInProgressDto.getRankId() != null) {

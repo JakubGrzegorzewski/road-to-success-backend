@@ -20,6 +20,13 @@ class RankInProgressController {
         return ResponseEntity.ok(rankInProgressService.findById(id));
     }
 
+    @GetMapping("/generate/{id}")
+    public ResponseEntity<byte[]> generateFile(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=rank_in_progress.pdf")
+                .body(rankInProgressService.generateFile(id));
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<RankInProgressDto>> findAllRanksInProgressForUser(@PathVariable long userId) {
         return ResponseEntity.ok(rankInProgressService.findAllRanksInProgressForUser(userId));

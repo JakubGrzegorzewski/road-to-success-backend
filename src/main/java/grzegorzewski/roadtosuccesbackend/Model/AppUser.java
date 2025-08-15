@@ -28,6 +28,10 @@ public class AppUser {
     private List<RankInProgress> ranksInProgress;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("mentor-rankInProgress")
+    private List<RankInProgress> mentorRanksInProgress;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference("user-comments")
     private List<Comment> comments;
 }

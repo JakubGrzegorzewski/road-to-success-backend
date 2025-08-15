@@ -18,5 +18,6 @@ public class AppUserDto {
     private String password;
     private String role;
     private List<Long> ranksInProgressIds;
+    private List<Long> mentorRanksInProgressIds;
     private List<Long> commentIds;
 }
