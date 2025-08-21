@@ -27,7 +27,7 @@ public class AppUser {
     @JsonManagedReference("user-rankInProgress")
     private List<RankInProgress> ranksInProgress;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference("mentor-rankInProgress")
     private List<RankInProgress> mentorRanksInProgress;
 
