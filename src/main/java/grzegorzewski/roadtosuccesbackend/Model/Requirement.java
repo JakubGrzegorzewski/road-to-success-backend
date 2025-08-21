@@ -20,6 +20,7 @@ public class Requirement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String number;
+    @Lob
     private String content;
 
     @ManyToOne

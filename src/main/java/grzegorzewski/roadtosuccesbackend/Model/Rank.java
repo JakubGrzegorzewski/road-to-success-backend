@@ -20,7 +20,7 @@ public class Rank {
     private Long id;
     private String fullName;
     private String shortName;
-    @Column(length = 1000)
+    @Lob
     private String idea;
     private List<String> startRequirements;
     private List<String> endRequirements;

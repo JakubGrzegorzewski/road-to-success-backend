@@ -25,6 +25,7 @@ public class Task {
     @JsonBackReference("requirement-tasks")
     private Requirement requirement;
 
+    @Lob
     private String content;
     @Enumerated(EnumType.STRING)
     private Status status;
