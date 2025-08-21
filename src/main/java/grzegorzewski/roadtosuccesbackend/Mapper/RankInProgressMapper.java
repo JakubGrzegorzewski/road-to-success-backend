@@ -1,6 +1,8 @@
 package grzegorzewski.roadtosuccesbackend.Mapper;
 
+import grzegorzewski.roadtosuccesbackend.Dto.BasicRankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Dto.RankInProgressDto;
+import grzegorzewski.roadtosuccesbackend.Model.AppUser;
 import grzegorzewski.roadtosuccesbackend.Model.RankInProgress;
 import grzegorzewski.roadtosuccesbackend.Model.Task;
 import org.springframework.stereotype.Component;
@@ -38,5 +40,20 @@ public class RankInProgressMapper {
 
     public List<RankInProgressDto> toDtoList(List<RankInProgress> ranksInProgress) {
         return ranksInProgress.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    public static BasicRankInProgressDto toBasicDto(RankInProgress rankInProgress) {
+        AppUser mentor = rankInProgress.getMentor();
+        return BasicRankInProgressDto.builder()
+                .rankInProgressId(rankInProgress.getId())
+                .rankId(rankInProgress.getRank().getId())
+                .fullName(rankInProgress.getRank().getFullName())
+                .shortName(rankInProgress.getRank().getShortName())
+                .userId(rankInProgress.getUser().getId())
+                .userName(rankInProgress.getUser().getFullName())
+                .mentorId(mentor != null ? mentor.getId() : null)
+                .mentorName(mentor != null ? mentor.getFullName() : null)
+                .status(rankInProgress.getStatus())
+                .build();
     }
 }

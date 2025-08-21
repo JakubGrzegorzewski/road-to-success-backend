@@ -1,5 +1,6 @@
 package grzegorzewski.roadtosuccesbackend.Controller;
 
+import grzegorzewski.roadtosuccesbackend.Dto.BasicRankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Dto.RankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Service.RankInProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,12 @@ class RankInProgressController {
         return ResponseEntity.ok(rankInProgressService.findById(id));
     }
 
-    @GetMapping("/generate/{id}")
+    @GetMapping("/{id}/basic")
+    public ResponseEntity<BasicRankInProgressDto> findBasicById(@PathVariable long id) {
+        return ResponseEntity.ok(rankInProgressService.findBasicById(id));
+    }
+
+    @GetMapping("/{id}/generatePDF")
     public ResponseEntity<byte[]> generateFile(@PathVariable long id) {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=rank_in_progress.pdf")
@@ -30,6 +36,21 @@ class RankInProgressController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<RankInProgressDto>> findAllRanksInProgressForUser(@PathVariable long userId) {
         return ResponseEntity.ok(rankInProgressService.findAllRanksInProgressForUser(userId));
+    }
+
+    @GetMapping("/user/{userId}/basic")
+    public ResponseEntity<List<BasicRankInProgressDto>> findAllBasicRanksInProgressForUser(@PathVariable long userId) {
+        return ResponseEntity.ok(rankInProgressService.findAllBasicRanksInProgressForUser(userId));
+    }
+
+    @GetMapping("/mentor/{userId}")
+    public ResponseEntity<List<RankInProgressDto>> findAllRanksInProgressForMentor(@PathVariable long userId) {
+        return ResponseEntity.ok(rankInProgressService.findAllRanksInProgressForMentor(userId));
+    }
+
+    @GetMapping("/mentor/{userId}/basic")
+    public ResponseEntity<List<BasicRankInProgressDto>> findAllBasicRanksInProgressForMentor(@PathVariable long userId) {
+        return ResponseEntity.ok(rankInProgressService.findAllBasicRanksInProgressForMentor(userId));
     }
 
     @PostMapping

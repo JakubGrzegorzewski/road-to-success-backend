@@ -3,6 +3,7 @@ package grzegorzewski.roadtosuccesbackend.Service;
 import grzegorzewski.roadtosuccesbackend.Document.Write.AdvancementDocument;
 import grzegorzewski.roadtosuccesbackend.Document.Write.AdvDocTask;
 import grzegorzewski.roadtosuccesbackend.Document.Write.AdvDocData;
+import grzegorzewski.roadtosuccesbackend.Dto.BasicRankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Dto.RankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Mapper.RankInProgressMapper;
 import grzegorzewski.roadtosuccesbackend.Model.AppUser;
@@ -78,6 +79,40 @@ public class RankInProgressService {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
         return rankInProgressMapper.toDtoList(user.getRanksInProgress());
+    }
+
+    public List<RankInProgressDto> findAllRanksInProgressForMentor(long userId) {
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
+        return rankInProgressMapper.toDtoList(user.getMentorRanksInProgress());
+    }
+
+    public BasicRankInProgressDto findBasicById(long id) {
+        RankInProgress rankInProgress = rankInProgressRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("RankInProgress not found with id " + id));
+        return RankInProgressMapper.toBasicDto(rankInProgress);
+    }
+
+    public List<BasicRankInProgressDto> findAllBasicRanksInProgressForUser(long userId) {
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
+        List<RankInProgress> ranksInProgress = user.getRanksInProgress();
+        List<BasicRankInProgressDto> basicDtos = new ArrayList<>();
+        for (RankInProgress rank : ranksInProgress) {
+            basicDtos.add(RankInProgressMapper.toBasicDto(rank));
+        }
+        return basicDtos;
+    }
+
+    public List<BasicRankInProgressDto> findAllBasicRanksInProgressForMentor(long userId) {
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
+        List<RankInProgress> ranksInProgress = user.getMentorRanksInProgress();
+        List<BasicRankInProgressDto> basicDtos = new ArrayList<>();
+        for (RankInProgress rank : ranksInProgress) {
+            basicDtos.add(RankInProgressMapper.toBasicDto(rank));
+        }
+        return basicDtos;
     }
 
     public RankInProgressDto save(RankInProgressDto rankInProgressDto) {
