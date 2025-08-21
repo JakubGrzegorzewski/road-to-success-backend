@@ -23,6 +23,7 @@ public class Comment {
     @JsonBackReference("user-comments")
     private AppUser user;
 
+    @Lob
     private String content;
 
     @ManyToOne
