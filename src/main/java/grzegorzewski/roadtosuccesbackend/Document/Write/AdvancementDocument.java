@@ -46,8 +46,7 @@ public class AdvancementDocument {
         if (userData.getIdea() != null) {
             createSecondPage();
         }
-
-        for (TaskData task : userData.getTasks()) {
+        for (TaskData task : userData.getTasks().stream().sorted((t1, t2) -> compareNaturally(t1.getTitle(), t2.getTitle())).toList()) {
             createTaskPages(task);
         }
 
@@ -302,4 +301,47 @@ public class AdvancementDocument {
         content.showText(String.valueOf(pageNumber));
         content.endText();
     }
+
+
+    private int compareNaturally(String s1, String s2) {
+            int len1 = s1.length();
+            int len2 = s2.length();
+            int i = 0, j = 0;
+
+            while (i < len1 && j < len2) {
+                if (Character.isDigit(s1.charAt(i)) && Character.isDigit(s2.charAt(j))) {
+                    // Extract numeric parts (digits only, no decimal points)
+                    StringBuilder num1 = new StringBuilder();
+                    StringBuilder num2 = new StringBuilder();
+
+                    while (i < len1 && Character.isDigit(s1.charAt(i))) {
+                        num1.append(s1.charAt(i++));
+                    }
+                    while (j < len2 && Character.isDigit(s2.charAt(j))) {
+                        num2.append(s2.charAt(j++));
+                    }
+
+                    // Compare as integers
+                    try {
+                        int n1 = Integer.parseInt(num1.toString());
+                        int n2 = Integer.parseInt(num2.toString());
+                        int result = Integer.compare(n1, n2);
+                        if (result != 0) return result;
+                    } catch (NumberFormatException e) {
+                        // Fallback to string comparison if parsing fails
+                        int result = num1.toString().compareTo(num2.toString());
+                        if (result != 0) return result;
+                    }
+                } else {
+                    // Compare character by character
+                    if (s1.charAt(i) != s2.charAt(j)) {
+                        return Character.compare(s1.charAt(i), s2.charAt(j));
+                    }
+                    i++;
+                    j++;
+                }
+            }
+
+            return Integer.compare(len1, len2);
+        }
 }
