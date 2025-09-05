@@ -1,8 +1,8 @@
 package grzegorzewski.roadtosuccesbackend.Service;
 
 import grzegorzewski.roadtosuccesbackend.Document.Write.AdvancementDocument;
-import grzegorzewski.roadtosuccesbackend.Document.Write.AdvDocTask;
-import grzegorzewski.roadtosuccesbackend.Document.Write.AdvDocData;
+import grzegorzewski.roadtosuccesbackend.Document.Write.TaskData;
+import grzegorzewski.roadtosuccesbackend.Document.Write.UserData;
 import grzegorzewski.roadtosuccesbackend.Dto.BasicRankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Dto.RankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Mapper.RankInProgressMapper;
@@ -46,15 +46,15 @@ public class RankInProgressService {
                 .orElseThrow(() -> new EntityNotFoundException("RankInProgress not found with id " + id));
 
 
-        AdvDocData userData = new AdvDocData();
+        UserData userData = new UserData();
 
         userData.setMenteeName(rankInProgress.getUser().getFullName());
         userData.setMentorName(rankInProgress.getMentor().getFullName());
         userData.setIdea(rankInProgress.getRank().getIdea());
 
-        List<AdvDocTask> tasks = new ArrayList<>();
+        List<TaskData> tasks = new ArrayList<>();
         rankInProgress.getTasks().forEach(task -> {
-            AdvDocTask taskData = new AdvDocTask();
+            TaskData taskData = new TaskData();
             taskData.setTitle(task.getRequirement().getNumber() + ". " + task.getRequirement().getContent());
             taskData.setIdeaPart(task.getPartIdea());
             taskData.setTask(task.getContent());

@@ -1,12 +1,16 @@
 package grzegorzewski.roadtosuccesbackend.Service;
 
 import grzegorzewski.roadtosuccesbackend.Dto.AppUserDto;
+import grzegorzewski.roadtosuccesbackend.Dto.BasicAppUserDto;
 import grzegorzewski.roadtosuccesbackend.Mapper.AppUserMapper;
 import grzegorzewski.roadtosuccesbackend.Model.AppUser;
 import grzegorzewski.roadtosuccesbackend.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AppUserService {
@@ -20,6 +24,17 @@ public class AppUserService {
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
         return userMapper.toDto(user);
+    }
+
+    public BasicAppUserDto getBasicById(long id){
+        AppUser user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+        return userMapper.toBasicDto(user);
+    }
+
+    public List<BasicAppUserDto> getAllAppUserBasic(){
+        List<AppUser> userDtos = (List<AppUser>) userRepository.findAll();
+        return userMapper.toBasicDtoList(userDtos);
     }
 
     public AppUserDto save(AppUserDto userDto) {
