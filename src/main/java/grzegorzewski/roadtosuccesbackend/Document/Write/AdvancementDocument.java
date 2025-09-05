@@ -1,10 +1,10 @@
 package grzegorzewski.roadtosuccesbackend.Document.Write;
 
+import lombok.Getter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
@@ -13,276 +13,293 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+@Getter
 public class AdvancementDocument {
-    private AdvDocData userData;
-    private final float IDEA_TEXT_WIDTH = 450f;
-    private int PAGE_NUMBER = 1;
+    private final UserData userData;
+    private final DocumentData documentData;
 
-    private final PDDocument document;
-    private final PDFont boldFont;
-    private final PDFont mediumFont;
-    private final PDFont lightFont;
-
-    public AdvancementDocument(AdvDocData userData) throws IOException {
-        document = new PDDocument();
-        boldFont = PDType0Font.load(document, new java.io.File("src/main/resources/fonts/Museo-700.ttf"));
-        mediumFont = PDType0Font.load(document, new java.io.File("src/main/resources/fonts/Museo-500.ttf"));
-        lightFont = PDType0Font.load(document, new java.io.File("src/main/resources/fonts/Museo-300.ttf"));
-
+    public AdvancementDocument(UserData userData) throws IOException {
+        documentData = new DocumentData();
+        documentData.setDocument(new PDDocument());
+        documentData.setBoldFont(
+                PDType0Font.load(
+                        documentData.getDocument(),
+                        new java.io.File("src/main/resources/fonts/Museo-700.ttf"))
+        );
+        documentData.setMediumFont(
+                PDType0Font.load(
+                        documentData.getDocument(),
+                        new java.io.File("src/main/resources/fonts/Museo-500.ttf"))
+        );
+        documentData.setLightFont(
+                PDType0Font.load(
+                        documentData.getDocument(),
+                        new java.io.File("src/main/resources/fonts/Museo-300.ttf"))
+        );
         this.userData = userData;
     }
 
     public void generateDocument(ByteArrayOutputStream outputStream) throws IOException {
         PDPage firstPage = createFirstPage(userData);
-        document.addPage(firstPage);
+        documentData.getDocument().addPage(firstPage);
 
         if (userData.getIdea() != null) {
-            document.addPage(createSecondPage());
+            createSecondPage();
         }
 
-        for (AdvDocTask task : userData.getTasks()) {
-            document.addPage(createTaskPages(task));
+        for (TaskData task : userData.getTasks()) {
+            createTaskPages(task);
         }
 
-        document.save(outputStream);
-        document.close();
+        documentData.getDocument().save(outputStream);
+        documentData.getDocument().close();
     }
 
-    private PDPage createSecondPage() throws IOException {
+    private PDPage createFirstPage(UserData data) throws IOException {
         PDPage page = new PDPage(PDRectangle.A4);
-        try (PDPageContentStream content = new PDPageContentStream(document, page)) {
+
+        try (PDPageContentStream content = new PDPageContentStream(documentData.getDocument(), page)) {
             addBackground(content, page);
+            PDFLayoutUtils.drawCenteredImage(content, page, data.getImagePath(), 120, new Vector2D(-20, 170), documentData.getDocument());
 
-            content.beginText();
+            float currentY = page.getArtBox().getHeight() - 400;
 
-            float previousX = 20;
+            // Title
+            Paragraph titleParagraph = new Paragraph();
+            titleParagraph.setFont(documentData.getBoldFont());
+            titleParagraph.setFontSize(24);
+            titleParagraph.setLeadingSize(26);
+            titleParagraph.setWidth(documentData.getTextWidth());
+            titleParagraph.setColor(Color.BLACK);
+            titleParagraph.setAlignment(ParagraphAlignment.CENTER);
+            titleParagraph.setText(List.of("KARTA PRÓBY NA STOPIEŃ"));
+            titleParagraph.setPosition(new Vector2D(40, currentY));
+            titleParagraph.drawParagraph(page, documentData.getDocument(), 80);
+
+            // Advancement name
+            Paragraph advancementParagraph = titleParagraph.clone();
+            advancementParagraph.setColor(Color.decode(userData.getThemeColor()));
+            advancementParagraph.setText(List.of(data.getAdvancementName()));
+            advancementParagraph.setPosition(new Vector2D(40, titleParagraph.getParagraphBottomY() - 5));
+            advancementParagraph.drawParagraph(page, documentData.getDocument(), 80);
+
+            // Mentee label
+            Paragraph menteeLabelParagraph = new Paragraph();
+            menteeLabelParagraph.setFont(documentData.getMediumFont());
+            menteeLabelParagraph.setFontSize(18);
+            menteeLabelParagraph.setLeadingSize(20);
+            menteeLabelParagraph.setWidth(documentData.getTextWidth());
+            menteeLabelParagraph.setColor(Color.decode(userData.getThemeColor()));
+            menteeLabelParagraph.setAlignment(ParagraphAlignment.CENTER);
+            menteeLabelParagraph.setText(List.of("Imię, nazwisko, stopień podopiecznego"));
+            menteeLabelParagraph.setPosition(new Vector2D(40, advancementParagraph.getParagraphBottomY() - 10));
+            menteeLabelParagraph.drawParagraph(page, documentData.getDocument(), 80);
+
+            // Mentee name
+            Paragraph menteeNameParagraph = menteeLabelParagraph.clone();
+            menteeNameParagraph.setFont(documentData.getLightFont());
+            menteeNameParagraph.setColor(Color.BLACK);
+            menteeNameParagraph.setText(List.of(data.getMenteeName()));
+            menteeNameParagraph.setPosition(new Vector2D(40, menteeLabelParagraph.getParagraphBottomY() - 5));
+            menteeNameParagraph.drawParagraph(page, documentData.getDocument(), 80);
+
+            // Mentor label
+            Paragraph mentorLabelParagraph = menteeLabelParagraph.clone();
+            mentorLabelParagraph.setText(List.of("Imię, nazwisko, stopień opiekuna"));
+            mentorLabelParagraph.setPosition(new Vector2D(40, menteeNameParagraph.getParagraphBottomY() - 5));
+            mentorLabelParagraph.drawParagraph(page, documentData.getDocument(), 80);
+
+            // Mentor name
+            Paragraph mentorNameParagraph = menteeNameParagraph.clone();
+            mentorNameParagraph.setText(List.of(data.getMentorName()));
+            mentorNameParagraph.setPosition(new Vector2D(40, mentorLabelParagraph.getParagraphBottomY() - 5));
+            mentorNameParagraph.drawParagraph(page, documentData.getDocument(), 80);
+
+            addFooter(content, page, documentData.getPAGE_NUMBER());
+            documentData.incrementPageNumber();
+        } catch (Exception e) {
+            throw new IOException("Failed to create PDF page", e);
+        }
+
+        return page;
+    }
+
+    private void createSecondPage() throws IOException {
+        PDPage page = new PDPage(PDRectangle.A4);
+        try (PDPageContentStream content = new PDPageContentStream(documentData.getDocument(), page)) {
+            addBackground(content, page);
 
             // Idea section title
-            String ideaTitle = "Idea stopnia";
-            content.setFont(boldFont, 24);
-            content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
-            float ideaTitleX = CustomPDFMethods.getNextLineCenterOffset(ideaTitle, boldFont, 24, page);
-            content.newLineAtOffset(ideaTitleX - previousX, page.getArtBox().getHeight() - 200);
-            content.showText(ideaTitle);
-            previousX = ideaTitleX;
+            Paragraph ideaTitleParagraph = new Paragraph();
+            ideaTitleParagraph.setFont(documentData.getBoldFont());
+            ideaTitleParagraph.setFontSize(24);
+            ideaTitleParagraph.setLeadingSize(26);
+            ideaTitleParagraph.setWidth(documentData.getTextWidth());
+            ideaTitleParagraph.setColor(Color.decode(userData.getThemeColor()));
+            ideaTitleParagraph.setAlignment(ParagraphAlignment.CENTER);
+            ideaTitleParagraph.setText(List.of("Idea stopnia"));
+            ideaTitleParagraph.setPosition(new Vector2D(40, page.getArtBox().getHeight() - 100));
+            ideaTitleParagraph.drawParagraph(page, documentData.getDocument(), 80);
 
             // Idea text
-            content.setFont(lightFont, 14);
-            content.setNonStrokingColor(Color.BLACK);
+            Paragraph ideaTextParagraph = new Paragraph();
+            ideaTextParagraph.setFont(documentData.getLightFont());
+            ideaTextParagraph.setFontSize(14);
+            ideaTextParagraph.setLeadingSize(16);
+            ideaTextParagraph.setWidth(documentData.getTextWidth());
+            ideaTextParagraph.setColor(Color.BLACK);
+            ideaTextParagraph.setAlignment(ParagraphAlignment.JUSTIFIED);
+            ideaTextParagraph.setText(ideaTextParagraph.splitTextIntoLines(userData.getIdea()));
+            ideaTextParagraph.setPosition(new Vector2D(40, ideaTitleParagraph.getParagraphBottomY() - 30));
 
-            List<String> lines = CustomPDFMethods.splitTextIntoLines(userData.getIdea(), lightFont, 14, IDEA_TEXT_WIDTH);
-            String longestLine = findLongestLine(lines);
-            float ideaTextX = CustomPDFMethods.getNextLineCenterOffset(longestLine, lightFont, 14, page);
-
-            content.newLineAtOffset(ideaTextX - previousX, -30);
-            drawJustifiedText(content, lines, lightFont, 14, IDEA_TEXT_WIDTH);
-
-            content.endText();
-
-            addFooter(content, page, PAGE_NUMBER++);
-        } catch (Exception e) {
-            throw new IOException("Failed to create PDF page", e);
-        }
-        return page;
-    }
-
-    private PDPage createFirstPage(AdvDocData data) throws IOException {
-        PDPage page = new PDPage(PDRectangle.A4);
-
-        try (PDPageContentStream content = new PDPageContentStream(document, page)) {
-            addBackground(content, page);
-            drawCenteredImage(content, page, data.getImagePath(), 120, new Vector2D(-20,170));
-            drawContent(content, page, data, new Vector2D(20,0));
-            addFooter(content, page, PAGE_NUMBER++);
-        } catch (Exception e) {
-            throw new IOException("Failed to create PDF page", e);
-        }
-
-        return page;
-    }
-
-    private PDPage createTaskPages(AdvDocTask taskData) throws IOException {
-        PDPage page = new PDPage(PDRectangle.A4);
-        try (PDPageContentStream content = new PDPageContentStream(document, page)) {
-            addBackground(content, page);
-            content.beginText();
-
-            List<String> taskLines = CustomPDFMethods.splitTextIntoLines(taskData.getTitle(), boldFont, 18,450);
-            content.newLineAtOffset(40, page.getArtBox().getHeight()-60);
-            for (String line : taskLines) {
-                content.setFont(boldFont, 18);
-                content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
-                content.showText(line);
-                content.newLineAtOffset(0, -20);
+            List<String> ideaLeft = ideaTextParagraph.drawParagraph(page, documentData.getDocument(), 80);
+            if (!ideaLeft.isEmpty()) {
+                getDocumentData().getDocument().addPage(page);
+                ideaTextParagraph.setText(ideaLeft);
+                page = createContinuedIdeaPage(ideaTextParagraph);
             }
-            content.newLineAtOffset(0, -30);
-            content.setFont(mediumFont, 14);
-            content.setNonStrokingColor(Color.BLACK);
-            content.showText("Treść zadania:");
 
-            content.setFont(lightFont, 14);
-            content.newLineAtOffset(0, -20);
+            addFooter(content, page, documentData.getPAGE_NUMBER());
+            documentData.incrementPageNumber();
+        } catch (Exception e) {
+            throw new IOException("Failed to create PDF page", e);
+        }
 
-            drawJustifiedText(
-                    content,
-                    CustomPDFMethods.splitTextIntoLines(taskData.getTask(), mediumFont, 14, 475),
-                    lightFont,
-                    14,
-                    475
+        getDocumentData().getDocument().addPage(page);
+    }
+
+    private PDPage createContinuedIdeaPage(Paragraph paragraph) throws IOException {
+        List<String> textLeft = paragraph.getText();
+        PDPage page = new PDPage(PDRectangle.A4);
+        while (!textLeft.isEmpty()) {
+            page = new PDPage(PDRectangle.A4);
+            try (PDPageContentStream content = new PDPageContentStream(documentData.getDocument(), page)) {
+                addBackground(content, page);
+                addFooter(content, page, documentData.getPAGE_NUMBER());
+                documentData.incrementPageNumber();
+                paragraph.setPosition(new Vector2D(40, page.getArtBox().getHeight() - 60));
+                paragraph.setText(textLeft);
+                textLeft = paragraph.drawParagraph(page, documentData.getDocument(), 100);
+                if (!textLeft.isEmpty())
+                    getDocumentData().getDocument().addPage(page);
+            } catch (Exception e) {
+                throw new IOException("Failed to create PDF page", e);
+            }
+        }
+        return page;
+    }
+
+    private void createTaskPages(TaskData taskData) throws IOException {
+        PDPage page = new PDPage(PDRectangle.A4);
+
+        try (PDPageContentStream content = new PDPageContentStream(documentData.getDocument(), page)) {
+            addBackground(content, page);
+            addFooter(content, page, documentData.getPAGE_NUMBER());
+            documentData.incrementPageNumber();
+
+            Paragraph taskTitle = new Paragraph();
+            taskTitle.setFont(documentData.getBoldFont());
+            taskTitle.setFontSize(14);
+            taskTitle.setLeadingSize(16);
+            taskTitle.setWidth(documentData.getTextWidth());
+            taskTitle.setColor(Color.decode(userData.getThemeColor()));
+            taskTitle.setAlignment(ParagraphAlignment.LEFT);
+            taskTitle.setText(taskTitle.splitTextIntoLines(taskData.getTitle()));
+            taskTitle.setPosition(new Vector2D(40, page.getArtBox().getHeight() - 60));
+            taskTitle.drawParagraph(page, documentData.getDocument(), 80);
+
+            Paragraph contentHeader = taskTitle.clone();
+            contentHeader.setFont(documentData.getMediumFont());
+            contentHeader.setColor(Color.BLACK);
+            contentHeader.setText(List.of("Treść zadania:"));
+            contentHeader.setPosition(new Vector2D(40, taskTitle.getParagraphBottomY() - 20));
+            contentHeader.drawParagraph(page, documentData.getDocument(), 80);
+
+            Paragraph contentParagraph = contentHeader.clone();
+            contentParagraph.setFont(documentData.getLightFont());
+            contentParagraph.setText(
+                    contentParagraph.splitTextIntoLines(taskData.getTask())
             );
-
-            content.newLineAtOffset(0, -30);
-            content.setFont(mediumFont, 14);
-            content.setNonStrokingColor(Color.BLACK);
-            content.showText("Elementy idei stopnia realizowane tym zadaniem:");
-
-            content.setFont(lightFont, 14);
-            for (String part : taskData.getIdeaPart().split("\n")) {
-                content.newLineAtOffset(0, -5);
-                for (String line : CustomPDFMethods.splitTextIntoLines(part, lightFont, 14, 475)) {
-                    content.newLineAtOffset(0, -20);
-                    content.showText(line);
-                }
+            contentParagraph.setPosition(new Vector2D(40, contentHeader.getParagraphBottomY() - 10));
+            contentParagraph.setAlignment(ParagraphAlignment.JUSTIFIED);
+            contentParagraph.setFont(documentData.getLightFont());
+            List<String> contentLeft = contentParagraph.drawParagraph(page, documentData.getDocument(), 80);
+            if (!contentLeft.isEmpty()) {
+                getDocumentData().getDocument().addPage(page);
+                contentParagraph.setText(contentLeft);
+                page = createContinuedTaskPage(contentParagraph);
             }
 
+            Paragraph ideaHeader = contentHeader.clone();
+            ideaHeader.setText(List.of("Idea zadania:"));
+            ideaHeader.setPosition(new Vector2D(40, contentParagraph.getParagraphBottomY() - 20));
+            ideaHeader.drawParagraph(page, documentData.getDocument(), 80);
 
-            content.endText();
-            addFooter(content, page, PAGE_NUMBER++);
+            Paragraph ideaContent = contentParagraph.clone();
+            ideaContent.setText(
+                    ideaContent.splitTextIntoLines(taskData.getIdeaPart())
+            );
+            ideaContent.setAlignment(ParagraphAlignment.LEFT);
+            ideaContent.setPosition(new Vector2D(40, ideaHeader.getParagraphBottomY() - 10));
+            List<String> ideaLeft = ideaContent.drawParagraph(page, documentData.getDocument(), 80);
+            if (!ideaLeft.isEmpty()) {
+                getDocumentData().getDocument().addPage(page);
+                ideaContent.setText(ideaLeft);
+                page = createContinuedTaskPage(ideaContent);
+            }
+        }
+        catch (Exception e) {
+            throw new IOException("Failed to create PDF page", e);
+        }
+        getDocumentData().getDocument().addPage(page);
+    }
+
+    private PDPage createContinuedTaskPage(Paragraph paragraph) throws IOException {
+        List<String> textLeft = paragraph.getText();
+        PDPage page = new PDPage(PDRectangle.A4);
+        while (!textLeft.isEmpty()) {
+            page = new PDPage(PDRectangle.A4);
+            try (PDPageContentStream content = new PDPageContentStream(documentData.getDocument(), page)) {
+                addBackground(content, page);
+                addFooter(content, page, documentData.getPAGE_NUMBER());
+                documentData.incrementPageNumber();
+                paragraph.setPosition(new Vector2D(40, page.getArtBox().getHeight() - 60));
+                paragraph.setText(textLeft);
+                textLeft = paragraph.drawParagraph(page, documentData.getDocument(), 100);
+                if (!textLeft.isEmpty())
+                    getDocumentData().getDocument().addPage(page);
+            } catch (Exception e) {
+                throw new IOException("Failed to create PDF page", e);
+            }
         }
         return page;
     }
 
     private void addBackground(PDPageContentStream content, PDPage page) throws IOException {
-        drawCenteredImage(
+        PDFLayoutUtils.drawCenteredImage(
                 content,
                 page,
                 userData.getBackgroundImagePath(),
                 page.getBleedBox().getWidth(),
-                new Vector2D(0,0)
+                new Vector2D(0,0),
+                documentData.getDocument()
         );
-
     }
 
     private void addFooter(PDPageContentStream content, PDPage page, int pageNumber) throws IOException {
-        drawCenteredImage(content, page, "src/main/resources/images/footer.png", page.getArtBox().getWidth()/1.5f, new Vector2D(-20, -380));
-        PDImageXObject image = PDImageXObject.createFromFile(userData.getSideImagePath() + (PAGE_NUMBER % 2 == 0 ? "-1.png" : "-0.png"), document);
-        Vector2D imageSize = CustomPDFMethods.getImageScaleToSize(image, page.getArtBox().getHeight(), false);
+        PDFLayoutUtils.drawCenteredImage(content, page, "src/main/resources/images/footer.png", page.getArtBox().getWidth()/1.5f, new Vector2D(-20, -380), documentData.getDocument());
+        PDImageXObject image = PDImageXObject.createFromFile(userData.getSideImagePath() + (documentData.getPAGE_NUMBER() % 2 == 0 ? "-1.png" : "-0.png"), documentData.getDocument());
+        Vector2D imageSize = PDFLayoutUtils.getImageScaleToSize(image, page.getArtBox().getHeight(), false);
 
         content.drawImage(image, page.getArtBox().getWidth()-40, 0, imageSize.getX(), imageSize.getY());
         content.beginText();
-        content.setFont(boldFont, 18);
+        content.setFont(documentData.getBoldFont(), 18);
         content.setNonStrokingColor(Color.WHITE);
         content.setLeading(14);
 
-        float pageNumberWidth = boldFont.getStringWidth(String.valueOf(pageNumber)) / 1000 * 18;
+        float pageNumberWidth = documentData.getBoldFont().getStringWidth(String.valueOf(pageNumber)) / 1000 * 18;
         content.newLineAtOffset(page.getArtBox().getWidth() - 20 - pageNumberWidth/2, 20);
         content.showText(String.valueOf(pageNumber));
         content.endText();
-
-    }
-
-    private void drawCenteredImage(PDPageContentStream content, PDPage page, String src, float size, Vector2D offset) throws IOException {
-        PDImageXObject image = PDImageXObject.createFromFile(src, document);
-        Vector2D imageSize = CustomPDFMethods.getImageScaleToSize(image, size, true);
-        Vector2D imagePos = CustomPDFMethods.getMiddleWithSize(page, imageSize);
-
-        content.drawImage(image, imagePos.getX() + offset.getX(), imagePos.getY() + offset.getY(), imageSize.getX(), imageSize.getY());
-    }
-
-    private void drawContent(PDPageContentStream content, PDPage page, AdvDocData data, Vector2D offset) throws IOException {
-        content.beginText();
-
-        float currentY = 550;
-        float previousX = offset.getX();
-
-        // Title
-        String title = "KARTA PRÓBY NA STOPIEŃ";
-        content.setFont(boldFont, 24);
-        content.setNonStrokingColor(Color.BLACK);
-        float titleX = CustomPDFMethods.getNextLineCenterOffset(title, boldFont, 24, page);
-        content.newLineAtOffset(titleX - previousX, currentY-100);
-        content.showText(title);
-        previousX = titleX;
-        currentY -= 25;
-
-        // Advancement name
-        content.setFont(boldFont, 24);
-        content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
-        float advX = CustomPDFMethods.getNextLineCenterOffset(data.getAdvancementName(), boldFont, 24, page);
-        content.newLineAtOffset(advX - previousX, currentY - 550);
-        content.showText(data.getAdvancementName());
-        previousX = advX;
-        currentY -= 50;
-
-        // Mentee label
-        String menteeLabel = "Imię, nazwisko, stopień podopiecznego";
-        content.setFont(mediumFont, 18);
-        content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
-        float menteeLabelX = CustomPDFMethods.getNextLineCenterOffset(menteeLabel, mediumFont, 18, page);
-        content.newLineAtOffset(menteeLabelX - previousX, currentY - (550 - 25));
-        content.showText(menteeLabel);
-        previousX = menteeLabelX;
-        currentY -= 25;
-
-        // Mentee name
-        content.setFont(lightFont, 18);
-        content.setNonStrokingColor(Color.BLACK);
-        float menteeNameX = CustomPDFMethods.getNextLineCenterOffset(data.getMenteeName(), lightFont, 18, page);
-        content.newLineAtOffset(menteeNameX - previousX, -25);
-        content.showText(data.getMenteeName());
-        previousX = menteeNameX;
-        currentY -= 50;
-
-        // Mentor label
-        String mentorLabel = "Imię, nazwisko, stopień opiekuna";
-        content.setFont(mediumFont, 18);
-        content.setNonStrokingColor(Color.decode(userData.getThemeColor()));
-        float mentorLabelX = CustomPDFMethods.getNextLineCenterOffset(mentorLabel, mediumFont, 18, page);
-        content.newLineAtOffset(mentorLabelX - previousX, -25);
-        content.showText(mentorLabel);
-        previousX = mentorLabelX;
-        currentY -= 25;
-
-        // Mentor name
-        content.setFont(lightFont, 18);
-        content.setNonStrokingColor(Color.BLACK);
-        float mentorNameX = CustomPDFMethods.getNextLineCenterOffset(data.getMentorName(), lightFont, 18, page);
-        content.newLineAtOffset(mentorNameX - previousX, -25);
-        content.showText(data.getMentorName());
-
-        content.endText();
-    }
-
-    private String findLongestLine(List<String> lines) {
-        return lines.stream()
-                .max((line1, line2) -> {
-                    try {
-                        float width1 = lightFont.getStringWidth(line1) / 1000 * 14;
-                        float width2 = lightFont.getStringWidth(line2) / 1000 * 14;
-                        return Float.compare(width1, width2);
-                    } catch (IOException e) {
-                        return 0;
-                    }
-                })
-                .orElse("");
-    }
-
-    private void drawJustifiedText(PDPageContentStream content, List<String> lines, PDFont font, float fontSize, float width) throws IOException {
-        if (lines.isEmpty()) return;
-
-        String lastLine = lines.get(lines.size() - 1);
-        List<String> justifiedLines = lines.subList(0, lines.size() - 1);
-
-        for (String line : justifiedLines) {
-            float lineWidth = font.getStringWidth(line) / 1000 * fontSize;
-            float spacing = lineWidth < width ? (width - lineWidth) / Math.max(1, line.length() - 1) : 0;
-
-            content.setCharacterSpacing(spacing);
-            content.showText(line);
-            content.setCharacterSpacing(0);
-            content.newLineAtOffset(0, -18);
-        }
-
-        content.showText(lastLine);
     }
 }

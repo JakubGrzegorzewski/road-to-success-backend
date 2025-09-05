@@ -7,12 +7,12 @@ import java.util.List;
 
 @Getter
 @Setter
-public class AdvDocData {
+public class UserData {
     String menteeName;
     String mentorName;
     String idea;
     String advancement;
-    List<AdvDocTask> tasks;
+    List<TaskData> tasks;
 
     public String getAdvancementName() {
         return switch (advancement) {

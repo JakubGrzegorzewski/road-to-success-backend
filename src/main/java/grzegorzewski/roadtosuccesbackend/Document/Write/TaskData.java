@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AdvDocTask {
+public class TaskData {
     String title;
     String ideaPart;
     String task;
