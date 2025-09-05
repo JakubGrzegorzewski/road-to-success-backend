@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 enum ParagraphAlignment {
@@ -77,8 +78,10 @@ public class Paragraph implements Cloneable {
             }
             float lineWidth = font.getStringWidth(line) / 1000 * fontSize;
             float spacing = (lineWidth < width && lineWidth >= width * 0.75f) ? (width - lineWidth) / Math.max(1, line.length() - 1) : 0;
-
-            contentStream.setCharacterSpacing(spacing);
+            if (!line.startsWith("    •"))
+                contentStream.setCharacterSpacing(spacing);
+            else
+                contentStream.setCharacterSpacing(0);
             contentStream.showText(line);
             contentStream.setCharacterSpacing(0);
             contentStream.newLine();
@@ -168,18 +171,19 @@ public class Paragraph implements Cloneable {
      */
     public List<String> splitTextIntoLines(String text) throws IOException {
         List<String> lines = new ArrayList<>();
-        String[] paragraphs = text.split("\\n");
-
+        String[] paragraphs = text.split("<br/>");
         for (String paragraph : paragraphs) {
             String[] words = paragraph.split(" ");
             StringBuilder currentLine = new StringBuilder();
-
+            boolean isBulletPoint = false;
+            if (paragraph.startsWith("*")) {
+                words[0] = "    •";
+                isBulletPoint = true;
+            }
             for (String word : words) {
                 if (font.getStringWidth(word) / 1000 * fontSize > this.width) {
-                    if (!currentLine.isEmpty()) {
-                        lines.add(currentLine.toString());
-                        currentLine = new StringBuilder();
-                    }
+                    lines.add(currentLine.toString());
+                    currentLine = new StringBuilder();
                     lines.add(word);
                     continue;
                 }
@@ -194,19 +198,18 @@ public class Paragraph implements Cloneable {
                     if (lastSpaceIndex != -1 && (lineToAdd.length() - lastSpaceIndex - 1) <= 1) {
                         lines.add(lineToAdd.substring(0, lastSpaceIndex));
                         String orphan = lineToAdd.substring(lastSpaceIndex + 1);
-                        currentLine = new StringBuilder(orphan).append(" ").append(word);
+                        currentLine = new StringBuilder(isBulletPoint ? "       " + orphan : orphan).append(" ").append(word);
                     } else {
                         lines.add(lineToAdd);
-                        currentLine = new StringBuilder(word);
+                        currentLine = new StringBuilder(isBulletPoint ? "       " + word : word);
                     }
                 } else {
                     currentLine.append(currentLine.isEmpty() ? "" : " ").append(word);
                 }
             }
 
-            if (!currentLine.isEmpty()) {
-                lines.add(currentLine.toString());
-            }
+            lines.add(currentLine.toString());
+
         }
 
         return lines;
