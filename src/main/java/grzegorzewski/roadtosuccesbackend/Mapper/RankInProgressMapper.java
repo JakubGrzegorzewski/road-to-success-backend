@@ -22,6 +22,7 @@ public class RankInProgressMapper {
                 .userId(rankInProgress.getUser() != null ? rankInProgress.getUser().getId() : null)
                 .mentorId(rankInProgress.getMentor() != null ? rankInProgress.getMentor().getId() : null)
                 .status(rankInProgress.getStatus())
+                .style(rankInProgress.getStyle())
                 .taskIds(rankInProgress.getTasks() != null ?
                         rankInProgress.getTasks().stream()
                                 .map(Task::getId)
@@ -35,6 +36,7 @@ public class RankInProgressMapper {
         return RankInProgress.builder()
                 .id(dto.getId())
                 .status(dto.getStatus())
+                .style(dto.getStyle())
                 .build();
     }
 
@@ -54,6 +56,7 @@ public class RankInProgressMapper {
                 .mentorId(mentor != null ? mentor.getId() : null)
                 .mentorName(mentor != null ? mentor.getFullName() : null)
                 .status(rankInProgress.getStatus())
+                .style(rankInProgress.getStyle())
                 .build();
     }
 }

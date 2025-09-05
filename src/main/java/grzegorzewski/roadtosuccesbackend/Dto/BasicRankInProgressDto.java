@@ -1,6 +1,7 @@
 package grzegorzewski.roadtosuccesbackend.Dto;
 
 import grzegorzewski.roadtosuccesbackend.Model.Status;
+import grzegorzewski.roadtosuccesbackend.Model.Style;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,5 @@ public class BasicRankInProgressDto {
     private Long mentorId;
     private String mentorName;
     private Status status;
+    private Style style;
 }

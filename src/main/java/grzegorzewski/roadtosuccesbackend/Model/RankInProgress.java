@@ -32,6 +32,9 @@ public class RankInProgress {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Enumerated(EnumType.STRING)
+    private Style style;
+
     @OneToMany(mappedBy = "rankInProgress", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference("rankInProgress-tasks")
     private List<Task> tasks;
