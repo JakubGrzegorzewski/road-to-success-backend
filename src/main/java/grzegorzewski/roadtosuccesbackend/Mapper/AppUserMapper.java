@@ -2,7 +2,6 @@ package grzegorzewski.roadtosuccesbackend.Mapper;
 
 import grzegorzewski.roadtosuccesbackend.Dto.AppUserDto;
 import grzegorzewski.roadtosuccesbackend.Dto.BasicAppUserDto;
-import grzegorzewski.roadtosuccesbackend.Dto.BasicRankInProgressDto;
 import grzegorzewski.roadtosuccesbackend.Model.AppUser;
 import grzegorzewski.roadtosuccesbackend.Model.Comment;
 import grzegorzewski.roadtosuccesbackend.Model.RankInProgress;

@@ -11,7 +11,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 enum ParagraphAlignment {
